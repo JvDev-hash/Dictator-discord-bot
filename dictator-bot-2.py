@@ -10,7 +10,7 @@ from discord import Channel
 import numpy as np
 
 BOT_PREFIX = ("?", "*")
-TOKEN = 'NjY3NzM5NzEyNzY4NzA0NTIz.XiHJyg.QYrgbzthnCHpZT5r1PcRFebKOGM'  # Get at discordapp.com/developers/applications/me
+TOKEN = 'NjY3NzM5NzEyNzY4NzA0NTIz.XiNSYA.aCx0Eo9YRo7rhuk995K9PRKBbFg'  # Get at discordapp.com/developers/applications/me
 
 client = Bot(command_prefix=BOT_PREFIX)
 
@@ -45,7 +45,23 @@ async def on_message(message):
     elif message.content.startswith("-dt"):
         stringContent = message.content[4:]
         arrayTags = np.array(stringContent.split(","))
-        await client.send_message(message.channel, stringContent)
+        mydict = {}
+        tags = []
+        keys = len(arrayTags) -1
+        for i in range(keys):
+
+            tag = "tag"+str(i)
+            tags.insert(i, tag)
+            if keys > 0:
+                mydict[tags[i]] = arrayTags[i]
+            
+        mydict["channel"] = arrayTags[0]
+
+        archiveName = actualServer.name + "-" + str(arrayTags[0]) + ".json"
+        with open(archiveName, 'w') as fp:
+            json.dump(mydict, fp)
+
+        await client.send_message(message.channel, str(mydict))
 
     # Condicional to permit the other members send messages normally, without the bot annoying they
     elif message.content.find("-d") == -1 or message.content.find("-d") != 0:
