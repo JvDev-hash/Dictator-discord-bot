@@ -10,7 +10,7 @@ from discord import Channel
 import numpy as np
 
 BOT_PREFIX = ("?", "*")
-TOKEN = 'NjY3NzM5NzEyNzY4NzA0NTIz.XiNSYA.aCx0Eo9YRo7rhuk995K9PRKBbFg'  # Get at discordapp.com/developers/applications/me
+TOKEN = 'NjY3NzM5NzEyNzY4NzA0NTIz.XiNolw.c_dHMWnJg9y2Yemhqfc23Rg_4_s'  # Get at discordapp.com/developers/applications/me
 
 client = Bot(command_prefix=BOT_PREFIX)
 
@@ -45,23 +45,24 @@ async def on_message(message):
     elif message.content.startswith("-dt"):
         stringContent = message.content[4:]
         arrayTags = np.array(stringContent.split(","))
+        littleChannel = arrayTags[0]
+        newArrayTags = np.delete(arrayTags, 0)
         mydict = {}
         tags = []
-        keys = len(arrayTags) -1
+        keys = len(newArrayTags)
         for i in range(keys):
 
             tag = "tag"+str(i)
             tags.insert(i, tag)
-            if keys > 0:
-                mydict[tags[i]] = arrayTags[i]
+            mydict[tags[i]] = newArrayTags[i]
             
-        mydict["channel"] = arrayTags[0]
+        mydict["channel"] = littleChannel
 
         archiveName = actualServer.name + "-" + str(arrayTags[0]) + ".json"
         with open(archiveName, 'w') as fp:
             json.dump(mydict, fp)
 
-        await client.send_message(message.channel, str(mydict))
+        await client.send_message(message.channel, "Ok {0.author.mention}, i'll keeping an eye i this channel for you".format(message))
 
     # Condicional to permit the other members send messages normally, without the bot annoying they
     elif message.content.find("-d") == -1 or message.content.find("-d") != 0:
@@ -70,19 +71,33 @@ async def on_message(message):
     # Joke to a member which send a message with the bot prefix with a random message
     else:
         await client.send_message(message.channel, "{0.author.mention}, i don't know what you want to do, because i dont know this command...".format(message))
-        
-    # Verification if the message contains a blacklisted word in this channel, and moving her to the right place
-    if 'wow'.upper() in message.content.upper():
 
-        msg = "Hey! {0.author.mention} your message doesn't belongs here: {0.channel}".format(message)
-        sending = "Hahahaha {0.author.mention} wrote this message on wrong place".format(message)
+    # Verification if the message contains a blacklisted word in this channel, and moving her to the right place
+    for canal in actualServer.channels:
+        if canal.type == ChannelType.text:
+            jsonName = actualServer.name + "-" + str(canal.name) + ".json" 
+
+            with open(jsonName, 'r') as f:
+                open_dict = json.load(f)
+                idTags = len(open_dict) - 1
+                searchTags = []
+                for i in range(idTags):
+                    newTags = "tag"+str(i)
+                    searchTags.insert(i, newTags)
+                    for word in open_dict:
+                        if word[searchTags[i]].upper() in message.content.upper():
+                            msg = "Hey! {0.author.mention} your message doesn't belongs here: {0.channel}".format(message)
+                            sending = "Hahahaha {0.author.mention} wrote this message on wrong place".format(message)
         
-        await client.send_message(message.channel, msg)
-        await client.delete_message(message)
-        await client.send_message(client.get_channel(str(todos_canal[2])), sending)
-        await client.send_message(client.get_channel(str(todos_canal[2])), message.content)
-    else:
-        pass
+                            await client.send_message(message.channel, msg)
+                            await client.delete_message(message)
+                            await client.send_message(client.get_channel(str(todos_canal[2])), sending)
+                            await client.send_message(client.get_channel(str(todos_canal[2])), message.content)
+
+                        else:
+                            pass
+        else:
+            pass
     
 
 @client.event
