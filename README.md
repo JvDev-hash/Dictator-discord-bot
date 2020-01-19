@@ -1,1 +1,1 @@
-# Dictator-discord-bot
+# Doggo-discord-bot
