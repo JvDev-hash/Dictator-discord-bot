@@ -11,7 +11,7 @@ import numpy as np
 import subprocess as sb
 
 BOT_PREFIX = ("?", "*")
-TOKEN = 'NjY3NzM5NzEyNzY4NzA0NTIz.XiSOXA.-ASOJyHe9D-4hhKqY24axCao6L0'  # Get at discordapp.com/developers/applications/me
+TOKEN = 'NjY3NzM5NzEyNzY4NzA0NTIz.XiSWrw.K-7L1SPqy51IJ-rOn4_vYOw0XqE'  # Get at discordapp.com/developers/applications/me
 
 client = Bot(command_prefix=BOT_PREFIX)
 
@@ -63,15 +63,22 @@ async def on_message(message):
                 json.dump(mydict, fp)
 
             sb.call("./permit.sh")
-            await client.send_message(message.channel, "Oookay hooman {0.author.mention}, am doin a boop in this bork letters place for you".format(message))
+            await client.send_message(message.channel, "Oookay hooman {0.author.mention}, am doin a boop in this bork letters place for you :dog2: ".format(message))
+
+        # Command -dr = Remove an channel and tags associated to him, from the eyes of the bot
+        elif message.content.startswith("-dr"):
+            stringContent = message.content[4:]
+            argument = actualServer.name + "-" + stringContent + ".json"
+            sb.call(["./remove.sh", argument])
+            await client.send_message(message.channel, "Sniff.. Oookay hooman.. am doin a leave that bork letters place.. :dog2: :cry:")
 
         # Condicional to permit the other members send messages normally, without the bot annoying they
         elif message.content.find("-d") == -1 or message.content.find("-d") != 0:
             pass
-        
+            
         # Joke to a member which send a message with the bot prefix with a random message
         else:
-            await client.send_message(message.channel, "~A Not Understanding face..~ Hooman {0.author.mention}, am no understand wat you doin".format(message))
+            await client.send_message(message.channel, "~A Not Understanding face..~ :thinking: Hooman {0.author.mention}, am no understand wat you doin".format(message))
     
     else:
         # Verification if the message contains a blacklisted word in this channel, and moving her to the right place
@@ -88,8 +95,8 @@ async def on_message(message):
                             newTags = "tag"+str(i)
                             dictValue = open_dict.get(newTags)
                             if dictValue.upper() in message.content.upper():
-                                msg = "AWOOOOO! Hey fren {0.author.mention}, your bork doesn't belongs here: {0.channel}".format(message)
-                                sending = "Bork! The hooman {0.author.mention} borked this on wrong place".format(message)
+                                msg = "AWOOOOO! :dog: Hey fren {0.author.mention}, your bork doesn't belongs here: {0.channel}".format(message)
+                                sending = "Bork! :dog: The hooman {0.author.mention} borked this on wrong place".format(message)
 
                                 await client.send_message(message.channel, msg)
                                 await client.delete_message(message)
