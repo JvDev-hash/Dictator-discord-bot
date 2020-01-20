@@ -9,9 +9,10 @@ from discord import ChannelType
 from discord import Channel
 import numpy as np
 import subprocess as sb
+import discord
 
 BOT_PREFIX = ("?", "*")
-TOKEN = 'NjY3NzM5NzEyNzY4NzA0NTIz.XiSWrw.K-7L1SPqy51IJ-rOn4_vYOw0XqE'  # Get at discordapp.com/developers/applications/me
+TOKEN = 'NjY3NzM5NzEyNzY4NzA0NTIz.XiUBmQ.yZDLYRlWT8R3HDmuimJK3KERwMY'  # Get at discordapp.com/developers/applications/me
 
 client = Bot(command_prefix=BOT_PREFIX)
 
@@ -35,12 +36,12 @@ async def on_message(message):
     if message.content.startswith("-d"):
         # Command -dh = Got a JSON with the complete list of the Dictator Bot commands and send a Message with them
         if message.content.startswith("-dh"):
-            url = 'https://gist.githubusercontent.com/JvDev-hash/7b08167ea5c794dc6a0767169c4dd86d/raw/4e76ae7872ff336ba35240edac65fef0a19bed10/commands_dictator.json'
+            url = 'https://gist.githubusercontent.com/JvDev-hash/7b08167ea5c794dc6a0767169c4dd86d/raw/1c40ada08af5d6042fcee139b147efc5d0b0a4f2/commands_dictator.json'
             async with aiohttp.ClientSession() as session:  # Async HTTP request
                 raw_response = await session.get(url)
                 response = await raw_response.text()
                 response = json.loads(response)
-            await client.send_message(message.channel, "Bork!! Oookay hooman, am doin a send the list of my tricks..")
+            await client.send_message(message.channel, " :dog: Bork!! Oookay hooman, am doin a send the list of my tricks.. :dog2: ".format(message))
             await client.send_message(message.channel, response['list']['commands'])
 
         # Command -dt = Insert the chosen channel and the tags chosen to him, because the verification will compare this tags on this and other channels        
@@ -63,14 +64,14 @@ async def on_message(message):
                 json.dump(mydict, fp)
 
             sb.call("./permit.sh")
-            await client.send_message(message.channel, "Oookay hooman {0.author.mention}, am doin a boop in this bork letters place for you :dog2: ".format(message))
+            await client.send_message(message.channel, "Oookay hooman {0.author.mention}, am doin a sniff snoff in this bork letters place for you :dog2: ".format(message))
 
         # Command -dr = Remove an channel and tags associated to him, from the eyes of the bot
         elif message.content.startswith("-dr"):
             stringContent = message.content[4:]
             argument = actualServer.name + "-" + stringContent + ".json"
             sb.call(["./remove.sh", argument])
-            await client.send_message(message.channel, "Sniff.. Oookay hooman.. am doin a leave that bork letters place.. :dog2: :cry:")
+            await client.send_message(message.channel, "Sniff.. Oookay hooman.. am doin a leave that bork letters place :dog2: :cry:")
 
         # Condicional to permit the other members send messages normally, without the bot annoying they
         elif message.content.find("-d") == -1 or message.content.find("-d") != 0:
@@ -94,7 +95,7 @@ async def on_message(message):
                         for i in range(idTags):
                             newTags = "tag"+str(i)
                             dictValue = open_dict.get(newTags)
-                            if dictValue.upper() in message.content.upper():
+                            if dictValue.upper() in message.content.upper() and message.channel.name != open_dict.get("channel"):
                                 msg = "AWOOOOO! :dog: Hey fren {0.author.mention}, your bork doesn't belongs here: {0.channel}".format(message)
                                 sending = "Bork! :dog: The hooman {0.author.mention} borked this on wrong place".format(message)
 
@@ -112,8 +113,6 @@ async def on_message(message):
  
 @client.event
 async def on_ready():
-    await client.change_presence(game=Game(name="For commands, type -dh"))
-    #await client.change_presence(game=Game(name="Keeping an eye on humans"))
     print("Logged in as " + client.user.name)
 
 async def list_servers():
@@ -126,9 +125,6 @@ async def list_servers():
 
 async def testCall():
     await client.wait_until_ready()
-    #x = sb.call(["ls", "|", "grep", "json"])
-    #x = sb.Popen("./script.sh", stdout=sb.PIPE, shell=True)
-    #(output, err) = x.communicate()
     #output = sb.check_output(["./list2.sh", "incles"]).decode("utf-8").split("\n")
     #output.remove("")
     for actualServer in client.servers:
@@ -137,7 +133,16 @@ async def testCall():
                 print(canal.name)
     await asyncio.sleep(600)
 
+# Looping to change the status
+async def status_task():
+    await client.wait_until_ready()
+    while True:
+        await client.change_presence(game=Game(name="For my tricks, bork -dh", type=0))
+        await asyncio.sleep(100)
+        await client.change_presence(game=Game(name="Doin a sniff snoff on hoomans", type=0))
+        await asyncio.sleep(100)
+
 
 client.loop.create_task(list_servers())
-#client.loop.create_task(testCall())
+client.loop.create_task(status_task())
 client.run(TOKEN)
