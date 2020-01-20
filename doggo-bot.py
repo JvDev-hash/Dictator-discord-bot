@@ -12,13 +12,14 @@ import subprocess as sb
 import discord
 
 BOT_PREFIX = ("?", "*")
-TOKEN = 'NjY3NzM5NzEyNzY4NzA0NTIz.XiUXcw.iSibAv6VJKCutu1CTWfmN8TEq8A'  # Get at discordapp.com/developers/applications/me
+TOKEN = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'  # Get at discordapp.com/developers/applications/me
 
 client = Bot(command_prefix=BOT_PREFIX)
 
 @client.event
 async def on_message(message):
 
+    founded = "No"
     # Getting the actual server and all channels on him
     actualServer = message.channel.server
     todos_canal = []
@@ -83,12 +84,13 @@ async def on_message(message):
     
     else:
         # Verification if the message contains a blacklisted word in this channel, and moving her to the right place
+        
         for canal in actualServer.channels:
             if canal.type == ChannelType.text:
                 jsonName = actualServer.name + "-" + str(canal.name) + ".json"
                 outputChannels = sb.check_output(["./list.sh", actualServer.name]).decode("utf-8").split("\n")
                 outputChannels.remove("")
-                if jsonName in outputChannels:
+                if jsonName in outputChannels and founded != "Yes":
                     with open(jsonName, 'r') as f:
                         open_dict = json.load(f)
                         idTags = len(open_dict) - 1
@@ -98,6 +100,7 @@ async def on_message(message):
                             if dictValue.upper() in message.content.upper() and message.channel.name != open_dict.get("channel"):
                                 msg = "AWOOOOO! :dog: Hey fren {0.author.mention}, your bork doesn't belongs here: {0.channel}".format(message)
                                 sending = "Bork! :dog: The hooman {0.author.mention} borked this on wrong place".format(message)
+                                founded = "Yes"
 
                                 await client.send_message(message.channel, msg)
                                 await client.delete_message(message)
@@ -108,8 +111,12 @@ async def on_message(message):
 
                             else:
                                 pass
-            
 
+            if founded == "Yes":
+                break
+            else:
+                continue
+                        
  
 @client.event
 async def on_ready():
