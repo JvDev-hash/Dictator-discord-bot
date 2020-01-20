@@ -12,7 +12,7 @@ import subprocess as sb
 import discord
 
 BOT_PREFIX = ("?", "*")
-TOKEN = 'NjY3NzM5NzEyNzY4NzA0NTIz.XiUBmQ.yZDLYRlWT8R3HDmuimJK3KERwMY'  # Get at discordapp.com/developers/applications/me
+TOKEN = 'NjY3NzM5NzEyNzY4NzA0NTIz.XiUXcw.iSibAv6VJKCutu1CTWfmN8TEq8A'  # Get at discordapp.com/developers/applications/me
 
 client = Bot(command_prefix=BOT_PREFIX)
 
@@ -122,16 +122,6 @@ async def list_servers():
         for server in client.servers:
             print(server.name)
         await asyncio.sleep(600)
-
-async def testCall():
-    await client.wait_until_ready()
-    #output = sb.check_output(["./list2.sh", "incles"]).decode("utf-8").split("\n")
-    #output.remove("")
-    for actualServer in client.servers:
-        for canal in actualServer.channels:
-            if canal.type == ChannelType.text:
-                print(canal.name)
-    await asyncio.sleep(600)
 
 # Looping to change the status
 async def status_task():
