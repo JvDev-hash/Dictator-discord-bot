@@ -10,6 +10,7 @@ from discord import Channel
 import numpy as np
 import subprocess as sb
 import discord
+import os
 
 BOT_PREFIX = ("-")
 TOKEN = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'  # Get at discordapp.com/developers/applications/me
@@ -17,40 +18,68 @@ TOKEN = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'  # 
 client = Bot(command_prefix=BOT_PREFIX)
 client.remove_command('help')
 
+paused = "No"
+
+# Some functions to manipulate the global variable
+def invert_values_work():
+    global paused
+    
+    if "No" in paused:
+        paused = "Yes"
+    else:
+        paused = "No"
+
+def get_value_paused():
+    global paused
+    x = paused
+    return x
+
 # Command -dt = Insert the chosen channel and the tags chosen to him, because the verification will compare this tags on this and other channels        
 @client.command(name='dt',
                 description="Insert the chosen channel and the tags chosen to him",
                 pass_context=True)
 async def insert(context, *args):
-    actualServer = context.message.server.name
-    arrayTags = list(args)
-    littleChannel = arrayTags[0]
-    arrayTags.pop(0)
-    mydict = {}
-    keys = len(arrayTags)
-    for i in range(keys):
+    roleAuthor = context.message.author.top_role
+    serverHierarchy = context.message.server.role_hierarchy
 
-        tag = "tag"+str(i)
-        mydict[tag] = arrayTags[i]
-        
-    mydict["channel"] = littleChannel
+    if roleAuthor.name == serverHierarchy[0].name or roleAuthor.name == serverHierarchy[1].name:
+        actualServer = context.message.server.name
+        arrayTags = list(args)
+        littleChannel = arrayTags[0]
+        arrayTags.pop(0)
+        mydict = {}
+        keys = len(arrayTags)
+        for i in range(keys):
 
-    archiveName = actualServer + "-" + str(littleChannel) + ".json"
-    with open(archiveName, 'w') as fp:
-        json.dump(mydict, fp)
+            tag = "tag"+str(i)
+            mydict[tag] = arrayTags[i]
+            
+        mydict["channel"] = littleChannel
 
-    sb.call("./permit.sh")
-    await client.send_message(context.message.channel, "Oookay hooman {0.author.mention}, am doin a sniff snoff in this bork letters place for you :dog2: ".format(context.message))
+        archiveName = actualServer + "-" + str(littleChannel) + ".json"
+        with open(archiveName, 'w') as fp:
+            json.dump(mydict, fp)
+
+        sb.call("./permit.sh")
+        await client.send_message(context.message.channel, "Oookay hooman {0.author.mention}, am doin a sniff snoff in this bork letters place for you :dog2: ".format(context.message))
+    else:
+        await client.send_message(context.message.channel, "Hooman {0.author.mention}, sorry i don't obey you :dog2: ".format(context))
 
 # Command -dr = Remove an channel and tags associated to him, from the eyes of the bot
 @client.command(name='dr',
                 description="Remove an channel and tags associated to him, from the eyes of the bot",
                 pass_context=True)
 async def remover(context, canal):
-    actualServer = context.message.server.name
-    argument = actualServer + "-" + canal + ".json"
-    sb.call(["./remove.sh", argument])
-    await client.send_message(context.message.channel, "Sniff.. Oookay hooman.. am doin a leave that bork letters place :dog2: :cry:")
+    roleAuthor = context.message.author.top_role
+    serverHierarchy = context.message.server.role_hierarchy
+
+    if roleAuthor.name == serverHierarchy[0].name or roleAuthor.name == serverHierarchy[1].name:
+        actualServer = context.message.server.name
+        argument = actualServer + "-" + canal + ".json"
+        sb.call(["./remove.sh", argument])
+        await client.send_message(context.message.channel, "Sniff.. Oookay hooman.. am doin a leave that bork letters place :dog2: :cry:")
+    else:
+        await client.send_message(context.message.channel, "Hooman {0.author.mention}, sorry i don't obey you :dog2: ".format(context))
 
 # Command -dh = List of commands aka Help command
 @client.command(name='dh',
@@ -65,7 +94,7 @@ async def halper(context):
 
     embed.set_author(name = '[Doggo Halp]')
 
-    url = 'https://gist.githubusercontent.com/JvDev-hash/7b08167ea5c794dc6a0767169c4dd86d/raw/805df9e2d53da07256a15201deda729dce38ec5c/commands_doggo.json'
+    url = 'https://gist.githubusercontent.com/JvDev-hash/7b08167ea5c794dc6a0767169c4dd86d/raw/890b3f44f83153ab6f250f18f59969251ee9dc94/commands_doggo.json'
     async with aiohttp.ClientSession() as session:  # Async HTTP request
         raw_response = await session.get(url)
         response = await raw_response.text()
@@ -77,73 +106,125 @@ async def halper(context):
         tag = "tag"+str(i)
         embed.add_field(name = str(response["commands"][tag])[0:3], value = str(response["commands"][tag])[6:], inline = False)
 
-    await client.send_message(context.message.channel, " :dog: Bork!! Oookay hooman, am doin a send the list of my tricks.. :dog2: ".format(context.message))
+    await client.send_message(context.message.channel, " :dog: Bork!! Oookay hooman, am doin a send the list of my tricks.. :dog2: ".format(context))
     await client.send_message(author, embed=embed)
+
+# Command -dp = Pause the bot work, for a moment
+@client.command(name='dp',
+                description="Pause the Doggo Patrol",
+                pass_context=True)
+async def pauser(context):
+    x = get_value_paused()
+
+    roleAuthor = context.message.author.top_role
+    serverHierarchy = context.message.server.role_hierarchy
+
+    if roleAuthor.name == serverHierarchy[0].name or roleAuthor.name == serverHierarchy[1].name:
+        if 'No' == x:
+            invert_values_work()
+            await client.send_message(context.message.channel, "Ok fren {0.message.author.mention}, i'll relax for now! :dog:".format(context))
+        else:
+            invert_values_work()
+            await client.send_message(context.message.channel, "Ok fren {0.message.author.mention}, i'm goin to work! :dog2:".format(context))
+    else:
+        await client.send_message(context.message.channel, "Hooman {0.author.mention}, sorry i don't obey you :dog2: ".format(context))
+
+# Command -ds = Show the Bot status    
+@client.command(name='ds',
+                description="Show the status of the Doggo Patrol",
+                pass_context=True)
+async def statuser(context):
+    x = get_value_paused()
+
+    if 'Yes' == x:
+        await client.send_file(context.message.channel, os.getcwd() + "/images/" + os.listdir('images')[1], content = "Heey fren {0.message.author.mention}, i'm relaxin now! :dog:".format(context))
+    elif 'No' == x:
+        await client.send_file(context.message.channel, os.getcwd() + "/images/" + os.listdir('images')[0], content = "I'm doin works now :dog: :dog2:")
+
+# Command -dl = Lists which text channels are registered on the bot
+@client.command(name='dl',
+                description="Lists which text channels are registered on the bot",
+                pass_context=True)
+async def statuser(context):
+    actualServer = context.message.server
+    outputChannels = sb.check_output(["./list.sh", actualServer.name]).decode("utf-8").split("\n")
+    outputChannels.remove("")
+    finalOutput = ""
+    for channel in actualServer.channels:
+        for outputs in outputChannels:
+            if channel.name in outputs:
+                finalOutput += "\n" + channel.name
+
+    await client.send_message(context.message.channel, "Hooman {0.message.author.mention}, here the list of channels that i sniff snoff :dog2: ".format(context))
+    await client.send_message(context.message.channel, finalOutput)
 
 @client.event
 async def on_message(message):
-
-    # 'PrivateChannel' object has no attribute 'server'
-    if message.channel.type == ChannelType.private:
-        return
-
-    founded = "No"
-
-    # Getting the actual server and all channels on him
-    actualServer = message.channel.server
-    todos_canal = []
-    i = 0
-    for canal in actualServer.channels:
-        if canal.type == ChannelType.text:
-            todos_canal.insert(i, canal.id)
-            i = i + 1
-            
-    # We do not want the bot to reply to itself
-    if message.author == client.user:
-        return
     
-    # If the message is a command, process as a command
-    if message.content.startswith("-d"):
-        await client.process_commands(message)
-
-    else:
-        try:
-            # Verification if the message contains a blacklisted word in this channel, and moving her to the right place
-            for canal in actualServer.channels:
-                if canal.type == ChannelType.text:
-                    jsonName = actualServer.name + "-" + str(canal.name) + ".json"
-                    outputChannels = sb.check_output(["./list.sh", actualServer.name]).decode("utf-8").split("\n")
-                    outputChannels.remove("")
-                    if jsonName in outputChannels and founded != "Yes":
-                        with open(jsonName, 'r') as f:
-                            open_dict = json.load(f)
-                            idTags = len(open_dict) - 1
-                            for i in range(idTags):
-                                newTags = "tag"+str(i)
-                                dictValue = open_dict.get(newTags)
-                                if dictValue.upper() in message.content.upper() and message.channel.name != open_dict.get("channel"):
-                                    msg = "AWOOOOO! :dog: Hey fren {0.author.mention}, your bork doesn't belongs here: {0.channel}".format(message)
-                                    sending = "Bork! :dog: The hooman {0.author.mention} borked this on wrong place".format(message)
-                                    founded = "Yes"
-                                    
-                                    await client.send_message(message.channel, msg)
-                                    await client.delete_message(message)
-                                    await client.send_message(client.get_channel(canal.id), sending)
-                                    await client.send_message(client.get_channel(canal.id), message.content)
-                                    
-
-                                    break
-
-                                else:
-                                    pass
-
-                if founded == "Yes":
-                    break
-                else:
-                    continue
-
-        except sb.CalledProcessError:
+    if get_value_paused() == 'No':
+        # 'PrivateChannel' object has no attribute 'server'
+        if message.channel.type == ChannelType.private:
             return
+
+        founded = "No"
+
+        # Getting the actual server and all channels on him
+        actualServer = message.channel.server
+        todos_canal = []
+        i = 0
+        for canal in actualServer.channels:
+            if canal.type == ChannelType.text:
+                todos_canal.insert(i, canal.id)
+                i = i + 1
+                
+        # We do not want the bot to reply to itself
+        if message.author == client.user:
+            return
+        
+        # If the message is a command, process as a command
+        if message.content.startswith("-d"):
+            await client.process_commands(message)
+
+        else:
+            try:
+                # Verification if the message contains a blacklisted word in this channel, and moving her to the right place
+                for canal in actualServer.channels:
+                    if canal.type == ChannelType.text:
+                        jsonName = actualServer.name + "-" + str(canal.name) + ".json"
+                        outputChannels = sb.check_output(["./list.sh", actualServer.name]).decode("utf-8").split("\n")
+                        outputChannels.remove("")
+                        if jsonName in outputChannels and founded != "Yes":
+                            with open(jsonName, 'r') as f:
+                                open_dict = json.load(f)
+                                idTags = len(open_dict) - 1
+                                for i in range(idTags):
+                                    newTags = "tag"+str(i)
+                                    dictValue = open_dict.get(newTags)
+                                    if dictValue.upper() in message.content.upper() and message.channel.name != open_dict.get("channel"):
+                                        msg = "AWOOOOO! :dog: Hey fren {0.author.mention}, your bork doesn't belongs here: {0.channel}".format(message)
+                                        sending = "Bork! :dog: The hooman {0.author.mention} borked this on wrong place".format(message)
+                                        founded = "Yes"
+                                        
+                                        await client.send_message(message.channel, msg)
+                                        await client.delete_message(message)
+                                        await client.send_message(client.get_channel(canal.id), sending)
+                                        await client.send_message(client.get_channel(canal.id), message.content)
+                                        
+
+                                        break
+
+                                    else:
+                                        pass
+
+                    if founded == "Yes":
+                        break
+                    else:
+                        continue
+
+            except sb.CalledProcessError:
+                return
+    else:
+        await client.process_commands(message)
     
 
 @client.event
