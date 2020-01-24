@@ -52,4 +52,34 @@ def flush_config(serverName, open_dict):
 
         table.put_item(
             Item = open_dict
-            )        
+            )
+
+# Created a function to get the configs of the channels from the DB
+def get_config(serverName, channel):
+
+    if ' ' in serverName:
+        serverName = serverName.replace(" ", "_")
+
+    table = dynamodb.Table(serverName)
+    
+    response = table.get_item(
+        Key={
+            'channel': channel
+        }
+    )
+
+    try:
+            
+        item = response.get("Item")
+
+        channelFinal = item.get("channel")
+
+        item.pop("channel")
+
+        item["channel"] = channelFinal
+
+        return item
+
+    except AttributeError:
+        pass
+        

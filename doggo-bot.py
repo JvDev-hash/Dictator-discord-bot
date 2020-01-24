@@ -12,7 +12,7 @@ import numpy as np
 import subprocess as sb
 import discord
 import os
-from flushbot import flush_config
+import flushbot as fb
 
 BOT_PREFIX = ("-")
 TOKEN = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'  # Get at discordapp.com/developers/applications/me
@@ -63,7 +63,7 @@ async def insert(context, *args):
             json.dump(mydict, fp)
 
         sb.call("./permit.sh")
-        await client.send_message(context.message.channel, "Oookay hooman {0.author.mention}, am doin a sniff snoff in this bork letters place for you :dog2: ".format(context.message))
+        await client.send_message(context.message.channel, "Oookay hooman {0.message.author.mention}, am doin a sniff snoff in this bork letters place for you :dog2: ".format(context.message))
     else:
         await client.send_message(context.message.channel, "Hooman {0.message.author.mention}, sorry i don't obey you :dog2: ".format(context))
 
@@ -175,24 +175,34 @@ async def statuser(context):
 @client.command(name='df',
                 description="Flush configs to database",
                 pass_context=True)
-async def statuser(context):
+async def statuser(context, flushType):
     roleAuthor = context.message.author.top_role
     serverHierarchy = context.message.server.role_hierarchy
     actualServer = context.message.server
 
     if roleAuthor.name == serverHierarchy[0].name or roleAuthor.name == serverHierarchy[1].name:
-        await client.send_message(context.message.channel, "Ok! Hooman i'll bury this in a safe place :dog:")
-        try:
-            outputChannels = sb.check_output(["./list.sh", actualServer.name]).decode("utf-8").split("\n")
-            outputChannels.remove("")
-            for outputs in outputChannels:
-                with open(outputs, 'r') as f:
-                    open_dict = json.load(f)
-                    flush_config(actualServer.name, open_dict)
-                f.close()
+        if flushType == "save":
+            await client.send_message(context.message.channel, "Ok! Hooman i'll bury this in a safe place :dog:")
+            try:
+                outputChannels = sb.check_output(["./list.sh", actualServer.name]).decode("utf-8").split("\n")
+                outputChannels.remove("")
+                for outputs in outputChannels:
+                    with open(outputs, 'r') as f:
+                        open_dict = json.load(f)
+                        flush_config(actualServer.name, open_dict)
+                    f.close()
 
-        except sb.CalledProcessError:
-            await client.send_message(context.message.channel, "Hooman i'dont have any channel recorded! :dog:")
+            except sb.CalledProcessError:
+                await client.send_message(context.message.channel, "Hooman i'dont have any channel recorded! :dog:")
+
+        elif flushType == "update":
+            await client.send_message(context.message.channel, "Ok! Hooman i'll get my doggo toys :dog:")
+            for chanels in actualServer.channels:
+                if chanels.type == ChannelType.text:
+                    open_dict = fb.get_config(actualServer.name, chanels.name)
+                    archiveName = actualServer.name + "-" + chanels.name + ".json"
+                    with open(archiveName, 'w') as fp:
+                        json.dump(open_dict, fp)
     else:
         await client.send_message(context.message.channel, "Hooman {0.message.author.mention}, sorry i don't obey you :dog2: ".format(context))
 
@@ -267,6 +277,7 @@ async def on_message(message):
 
 @client.event
 async def on_ready():
+    
     print("Logged in as " + client.user.name)
 
 async def list_servers():
