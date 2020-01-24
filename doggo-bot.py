@@ -138,12 +138,12 @@ async def statuser(context):
     archiveName = ""
 
     if 'Yes' == x:
-        archiveName = "doggo_sleep.jpg"
+        archiveName = "images/doggo_sleep.jpg"
         with open(archiveName, 'rb') as fp:
             await client.send_file(context.message.channel, fp, content = "Heey fren {0.message.author.mention}, i'm relaxin now! :dog:".format(context))
         fp.close()
     elif 'No' == x:
-        archiveName = "doggo_work.jpg"
+        archiveName = "images/doggo_work.jpg"
         with open(archiveName, 'rb') as fp:
             await client.send_file(context.message.channel, fp, content = "I'm doin works now :dog: :dog2:")
         fp.close()
