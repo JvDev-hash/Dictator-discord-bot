@@ -1,3 +1,4 @@
+# Work with Python 3.6
 import random
 import asyncio
 import aiohttp
@@ -11,6 +12,7 @@ import numpy as np
 import subprocess as sb
 import discord
 import os
+from flushbot import flush_config
 
 BOT_PREFIX = ("-")
 TOKEN = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'  # Get at discordapp.com/developers/applications/me
@@ -63,7 +65,7 @@ async def insert(context, *args):
         sb.call("./permit.sh")
         await client.send_message(context.message.channel, "Oookay hooman {0.author.mention}, am doin a sniff snoff in this bork letters place for you :dog2: ".format(context.message))
     else:
-        await client.send_message(context.message.channel, "Hooman {0.author.mention}, sorry i don't obey you :dog2: ".format(context))
+        await client.send_message(context.message.channel, "Hooman {0.message.author.mention}, sorry i don't obey you :dog2: ".format(context))
 
 # Command -dr = Remove an channel and tags associated to him, from the eyes of the bot
 @client.command(name='dr',
@@ -79,7 +81,7 @@ async def remover(context, canal):
         sb.call(["./remove.sh", argument])
         await client.send_message(context.message.channel, "Sniff.. Oookay hooman.. am doin a leave that bork letters place :dog2: :cry:")
     else:
-        await client.send_message(context.message.channel, "Hooman {0.author.mention}, sorry i don't obey you :dog2: ".format(context))
+        await client.send_message(context.message.channel, "Hooman {0.message.author.mention}, sorry i don't obey you :dog2: ".format(context))
 
 # Command -dh = List of commands aka Help command
 @client.command(name='dh',
@@ -127,7 +129,7 @@ async def pauser(context):
             invert_values_work()
             await client.send_message(context.message.channel, "Ok fren {0.message.author.mention}, i'm goin to work! :dog2:".format(context))
     else:
-        await client.send_message(context.message.channel, "Hooman {0.author.mention}, sorry i don't obey you :dog2: ".format(context))
+        await client.send_message(context.message.channel, "Hooman {0.message.author.mention}, sorry i don't obey you :dog2: ".format(context))
 
 # Command -ds = Show the Bot status    
 @client.command(name='ds',
@@ -168,6 +170,31 @@ async def statuser(context):
 
     except sb.CalledProcessError:
         await client.send_message(context.message.channel, "Hooman i'dont have any channel recorded! :dog:")
+
+# Command -df = Flush configs to database
+@client.command(name='df',
+                description="Flush configs to database",
+                pass_context=True)
+async def statuser(context):
+    roleAuthor = context.message.author.top_role
+    serverHierarchy = context.message.server.role_hierarchy
+    actualServer = context.message.server
+
+    if roleAuthor.name == serverHierarchy[0].name or roleAuthor.name == serverHierarchy[1].name:
+        await client.send_message(context.message.channel, "Ok! Hooman i'll bury this in a safe place :dog:")
+        try:
+            outputChannels = sb.check_output(["./list.sh", actualServer.name]).decode("utf-8").split("\n")
+            outputChannels.remove("")
+            for outputs in outputChannels:
+                with open(outputs, 'r') as f:
+                    open_dict = json.load(f)
+                    flush_config(actualServer.name, open_dict)
+                f.close()
+
+        except sb.CalledProcessError:
+            await client.send_message(context.message.channel, "Hooman i'dont have any channel recorded! :dog:")
+    else:
+        await client.send_message(context.message.channel, "Hooman {0.message.author.mention}, sorry i don't obey you :dog2: ".format(context))
 
 @client.event
 async def on_message(message):

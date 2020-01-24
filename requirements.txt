@@ -1,2 +1,4 @@
 discord.py==0.16.12
 numpy
+awscli
+boto3
