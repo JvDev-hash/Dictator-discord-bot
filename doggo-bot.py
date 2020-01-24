@@ -137,9 +137,9 @@ async def statuser(context):
     x = get_value_paused()
 
     if 'Yes' == x:
-        await client.send_file(context.message.channel, os.getcwd() + "/images/" + os.listdir('images')[1], content = "Heey fren {0.message.author.mention}, i'm relaxin now! :dog:".format(context))
+        await client.send_file(context.message.channel, "doggo_sleep.jpg", content = "Heey fren {0.message.author.mention}, i'm relaxin now! :dog:".format(context))
     elif 'No' == x:
-        await client.send_file(context.message.channel, os.getcwd() + "/images/" + os.listdir('images')[0], content = "I'm doin works now :dog: :dog2:")
+        await client.send_file(context.message.channel, "doggo_work.jpg", content = "I'm doin works now :dog: :dog2:")
 
 # Command -dl = Lists which text channels are registered on the bot
 @client.command(name='dl',
@@ -147,16 +147,20 @@ async def statuser(context):
                 pass_context=True)
 async def statuser(context):
     actualServer = context.message.server
-    outputChannels = sb.check_output(["./list.sh", actualServer.name]).decode("utf-8").split("\n")
-    outputChannels.remove("")
-    finalOutput = ""
-    for channel in actualServer.channels:
-        for outputs in outputChannels:
-            if channel.name in outputs:
-                finalOutput += "\n" + channel.name
+    try:
+        outputChannels = sb.check_output(["./list.sh", actualServer.name]).decode("utf-8").split("\n")
+        outputChannels.remove("")
+        finalOutput = ""
+        for channel in actualServer.channels:
+            for outputs in outputChannels:
+                if channel.name in outputs:
+                    finalOutput += "\n" + channel.name
 
-    await client.send_message(context.message.channel, "Hooman {0.message.author.mention}, here the list of channels that i sniff snoff :dog2: ".format(context))
-    await client.send_message(context.message.channel, finalOutput)
+        await client.send_message(context.message.channel, "Hooman {0.message.author.mention}, here the list of channels that i sniff snoff :dog2: ".format(context))
+        await client.send_message(context.message.channel, finalOutput)
+
+    except sb.CalledProcessError:
+        await client.send_message(context.message.channel, "Hooman i'dont have any channel recorded! :dog:")
 
 @client.event
 async def on_message(message):
