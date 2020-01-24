@@ -135,11 +135,18 @@ async def pauser(context):
                 pass_context=True)
 async def statuser(context):
     x = get_value_paused()
+    archiveName = ""
 
     if 'Yes' == x:
-        await client.send_file(context.message.channel, "doggo_sleep.jpg", content = "Heey fren {0.message.author.mention}, i'm relaxin now! :dog:".format(context))
+        archiveName = "doggo_sleep.jpg"
+        with open(archiveName, 'rb') as fp:
+            await client.send_file(context.message.channel, fp, content = "Heey fren {0.message.author.mention}, i'm relaxin now! :dog:".format(context))
+        fp.close()
     elif 'No' == x:
-        await client.send_file(context.message.channel, "doggo_work.jpg", content = "I'm doin works now :dog: :dog2:")
+        archiveName = "doggo_work.jpg"
+        with open(archiveName, 'rb') as fp:
+            await client.send_file(context.message.channel, fp, content = "I'm doin works now :dog: :dog2:")
+        fp.close()
 
 # Command -dl = Lists which text channels are registered on the bot
 @client.command(name='dl',
