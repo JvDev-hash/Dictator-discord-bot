@@ -11,8 +11,8 @@ import numpy as np
 import subprocess as sb
 import discord
 import os
-import flushmodule as fb
-import youtubemodule as ytb
+from modules import flushmodule as fb
+from modules import youtubemodule as ytb
 
 BOT_PREFIX = ("-")
 TOKEN = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'  # Get at discordapp.com/developers/applications/me
