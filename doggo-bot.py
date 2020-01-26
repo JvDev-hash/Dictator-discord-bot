@@ -11,7 +11,7 @@ import numpy as np
 import subprocess as sb
 import discord
 import os
-import flushbot as fb
+import flushmodule as fb
 import youtubemodule as ytb
 
 BOT_PREFIX = ("-")
