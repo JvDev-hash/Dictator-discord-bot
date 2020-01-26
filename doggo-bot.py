@@ -1,4 +1,3 @@
-# Work with Python 3.6
 import random
 import asyncio
 import aiohttp
@@ -12,7 +11,8 @@ import numpy as np
 import subprocess as sb
 import discord
 import os
-import flushbot as fb
+from modules import flushmodule as fb
+from modules import youtubemodule as ytb
 
 BOT_PREFIX = ("-")
 TOKEN = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'  # Get at discordapp.com/developers/applications/me
@@ -216,6 +216,10 @@ async def on_message(message):
 
         founded = "No"
 
+        extrasContent = ""
+
+        youtubeLink = ""
+
         # Getting the actual server and all channels on him
         actualServer = message.channel.server
         todos_canal = []
@@ -235,6 +239,20 @@ async def on_message(message):
 
         else:
             try:
+                # If the message is a Youtube Link, web scrap the Video Title
+                if ytb.youtube_detect(message.content) == "Yes":
+                    extrasContent = ytb.youtube_webscrap(message.content)
+                else:
+                    pass
+                
+                # If the message have white spaces, remove then
+                if ' ' in message.content:
+                    tempContent = message.content
+                    extrasContent = tempContent.replace(' ', '')
+
+                else:
+                    pass
+
                 # Verification if the message contains a blacklisted word in this channel, and moving her to the right place
                 for canal in actualServer.channels:
                     if canal.type == ChannelType.text:
@@ -261,9 +279,22 @@ async def on_message(message):
 
                                         break
 
-                                    else:
-                                        pass
+                                    elif dictValue.upper() in extrasContent.upper() and message.channel.name != open_dict.get("channel"):
+                                        msg = "AWOOOOO! :dog: Hey fren {0.author.mention}, your bork doesn't belongs here: {0.channel}".format(message)
+                                        sending = "Bork! :dog: The hooman {0.author.mention} borked this on wrong place".format(message)
+                                        founded = "Yes"
+                                        
+                                        await client.send_message(message.channel, msg)
+                                        await client.delete_message(message)
+                                        await client.send_message(client.get_channel(canal.id), sending)
+                                        await client.send_message(client.get_channel(canal.id), message.content)
+                                        
 
+                                        break
+                                    
+                                    else:
+                                        pass 
+                                        
                     if founded == "Yes":
                         break
                     else:
@@ -273,7 +304,6 @@ async def on_message(message):
                 return
     else:
         await client.process_commands(message)
-    
 
 @client.event
 async def on_ready():
